@@ -22,99 +22,83 @@ Tree::Tree()
     Node* x1 = new Node();
     x1->is_constant = true;
     x1->name = "x1";
-    x1->output_array = new QList<Node*>();
 
     Node* x2 = new Node();
     x2->is_constant = true;
     x2->name = "x2";
-    x2->output_array = new QList<Node*>();
 
     Node* x3 = new Node();
     x3->is_constant = true;
     x3->name = "x3";
-    x3->output_array = new QList<Node*>();
 
     Node* x4 = new Node();
     x4->is_constant = true;
     x4->name = "x4";
-    x4->output_array = new QList<Node*>();
 
     Node* x5 = new Node();
     x5->is_constant = true;
     x5->name = "x5";
-    x5->output_array = new QList<Node*>();
 
     Node* x6 = new Node();
     x6->is_constant = true;
     x6->name = "x6";
-    x6->output_array = new QList<Node*>();
 
     Node* x7 = new Node();
     x7->is_constant = true;
     x7->name = "x7";
-    x7->output_array = new QList<Node*>();
-
-//    4	ИЛИ-НЕ	И-НЕ	3ИЛИ-НЕ	ИЛИ	И
 
     F1->input_array = new QList<Node*>();
-    F1->output_array = new QList<Node*>();
     F1->input_array->append(x1);
     F1->input_array->append(x2);
-    F1->elementType = LogicType_OR_NOT;
+    F1->elementType = LogicType_OR;
     F1->is_last = false;
 
     F2->input_array = new QList<Node*>();
-    F2->output_array = new QList<Node*>();
     F2->input_array->append(x3);
     F2->elementType= LogicType_NOT;
     F2->is_last = false;
 
     F3->input_array = new QList<Node*>();
-    F3->output_array = new QList<Node*>();
     F3->input_array->append(x5);
     F3->input_array->append(x6);
-    F3->elementType= LogicType_AND_NOT;
+    F3->elementType= LogicType_XOR;
     F3->is_last = false;
 
     F4->input_array = new QList<Node*>();
-    F4->output_array = new QList<Node*>();
     F4->input_array->append(x4);
     F4->input_array->append(F3);
     F4->input_array->append(x7);
-    F4->elementType= LogicType_THREE_OR_NOT;
+    F4->elementType= LogicType_THREE_OR;
     F4->is_last = false;
 
     F5->input_array = new QList<Node*>();
-    F5->output_array = new QList<Node*>();
     F5->input_array->append(F2);
     F5->input_array->append(F4);
-    F5->elementType= LogicType_OR;
+    F5->elementType= LogicType_AND_NOT;
     F5->is_last = false;
 
     F6->input_array = new QList<Node*>();
-    F6->output_array = new QList<Node*>();
     F6->input_array->append(F1);
     F6->input_array->append(F5);
-    F6->elementType= LogicType_AND;
+    F6->elementType= LogicType_OR_NOT;
     F6->is_last = false;
 
-    F1->output_array->append(F6);
-    F2->output_array->append(F5);
-    F3->output_array->append(F4);
-    F4->output_array->append(F5);
-    F5->output_array->append(F6);
+    F1->output = F6;
+    F2->output = F5;
+    F3->output = F4;
+    F4->output = F5;
+    F5->output = F6;
 
-    x1->output_array->append(F1);
-    x2->output_array->append(F1);
+    x1->output = F1;
+    x2->output = F1;
 
-    x3->output_array->append(F2);
-    x4->output_array->append(F4);
+    x3->output = F2;
+    x4->output = F4;
 
-    x5->output_array->append(F3);
-    x6->output_array->append(F3);
+    x5->output = F3;
+    x6->output = F3;
 
-    x7->output_array->append(F4);
-
+    x7->output = F4;
 
     this->topNode->is_last = true;
 
@@ -131,22 +115,8 @@ QList<Node*>* Tree::getTestDataForElement(QString name)
     Node* brokenElement = this->findElement(name);
     brokenElement->is_broken = true;
 
-
-    int reverse_value = 0;
-    if (this->broken_value == 0)
-        reverse_value = 1;
-    QList<int>* values = brokenElement->valuesForGettingDeterminedValue(reverse_value);
-
-    for (int i = 0; i < brokenElement->input_array->count(); i++){
-        this->goDownAndSetValues(brokenElement->input_array->at(i), values->at(i));
-    }
     this->goUpAndMark(brokenElement);
     return fillTheConstants(new QList<Node*>(), this->topNode);
-}
-
-void Tree::goToChildsAndCalc()
-{
-
 }
 
 void Tree::goUpAndMark(Node* currentNode)
@@ -169,37 +139,39 @@ void Tree::goUpAndMark(Node* currentNode)
             }
             else {
                 nodeToWork->current_value = this->broken_value;
-                int reverse_value = 0;
-                if (this->broken_value == 0)
-                    reverse_value = 1;
-                for (int index = 0; index < inputs->count(); index++){
-                    Node* downNode = inputs->at(index);
-                    this->goDownAndSetValues(downNode, reverse_value);
-                }
-
+                this->goDownAndSetValues(nodeToWork, -1);
                 nodeToWork = nodeToWork->output;
             }
         }
         else {
             if (nodeToWork->is_last){
-                for (int i = 0; i < nodeToWork->input_array->count(); i++)
-                    if (!nodeToWork->is_broken && !nodeToWork->is_forwarded)
-                        this->goDownMarkAndCalculate(nodeToWork->input_array->at(i));
+                int valueSupport = nodeToWork->valueForwardSupport();
+                for (int i = 0; i < nodeToWork->input_array->count(); i++){
+                    Node* inputNode = nodeToWork->input_array->at(i);
+                    if (!inputNode->is_broken && !inputNode->is_forwarded){
+                        inputNode->current_value = valueSupport;
+                        this->goDownMarkAndCalculate(inputNode);
+                    }
+                }
                 canGoUp = false;
             }
-            else if (nodeToWork->is_forwarded){
-                for (int i = 0; i < nodeToWork->input_array->count(); i++)
-                    if (!nodeToWork->is_broken && !nodeToWork->is_forwarded)
-                        this->goDownMarkAndCalculate(nodeToWork->input_array->at(i));
+            else {
+                nodeToWork->is_forwarded = true;
+                int supportValue = nodeToWork->valueForwardSupport();
+                for (int i = 0; i < nodeToWork->input_array->count(); i++){
+                    Node* inputNode = nodeToWork->input_array->at(i);
+                    if (!inputNode->is_broken && !inputNode->is_forwarded){
+                        inputNode->current_value = supportValue;
+                        this->goDownMarkAndCalculate(inputNode);
+                    }
+                }
                 nodeToWork = nodeToWork->output;
             }
-
-            //
         }
     }
 }
 
-// under the broken element tree part
+// calculate already known values
 void Tree::goDownAndSetValues(Node* currentNode, int valueToSet)
 {
     // not node but initial value to the first nodes
@@ -274,6 +246,13 @@ Node* Tree::findElement(QString nameElement)
 Node* Tree::passTree(Node* currentNode, QString nameToFind)
 {
     qDebug() << "current_node " + currentNode->name;
+    if (currentNode->is_last){
+        if (currentNode->name.compare(nameToFind) == 0){
+            qDebug() << "finded " + currentNode->name;
+            return currentNode;
+        }
+    }
+
     if (currentNode->is_constant){
         qDebug() << "constant ";
         return NULL;

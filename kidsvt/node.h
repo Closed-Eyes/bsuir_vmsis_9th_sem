@@ -5,7 +5,9 @@
 #include <QList>
 #include <QString>
 
-enum LogicType {LogicType_OR, LogicType_AND, LogicType_AND_NOT, LogicType_OR_NOT, LogicType_THREE_OR_NOT, LogicType_NOT};
+enum LogicType {LogicType_OR, LogicType_AND, LogicType_AND_NOT,
+                LogicType_OR_NOT, LogicType_THREE_OR_NOT,
+                LogicType_THREE_OR, LogicType_NOT, LogicType_XOR};
 
 class Node
 {

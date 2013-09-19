@@ -119,6 +119,20 @@ QList<int>* Node::valuesForGettingDeterminedValue(int valueToGet)
 
             return valueList;
         };
+        case LogicType_THREE_OR:{
+            if (valueToGet == 1){
+                valueList->append(1);
+                valueList->append(1);
+                valueList->append(1);
+            }
+            else {
+                valueList->append(0);
+                valueList->append(0);
+                valueList->append(0);
+            }
+
+            return valueList;
+        };
         case LogicType_AND_NOT: {
             if (valueToGet == 1){
                 valueList->append(0);
@@ -143,6 +157,31 @@ QList<int>* Node::valuesForGettingDeterminedValue(int valueToGet)
                 valueList->append(0);
                 valueList->append(1);
                 valueList->append(1);
+            }
+
+            return valueList;
+        };
+        /*
+// -----------------------
+XOR
+a b - c
+-------
+0 0 - 0
+0 1 - 1
+1 0 - 1
+1 1 - 0
+
+XOR Value to support forwarding: 0
+// -----------------------
+        */
+        case LogicType_XOR: {
+            if (valueToGet == 1){
+                valueList->append(0);
+                valueList->append(1);
+            }
+            else {
+                valueList->append(0);
+                valueList->append(0);
             }
 
             return valueList;
@@ -166,11 +205,19 @@ int Node::valueForwardSupport()
             return 0;
             break;
         };
+        case LogicType_THREE_OR:{
+            return 0;
+            break;
+        };
         case LogicType_AND_NOT: {
             return 1;
             break;
         };
         case LogicType_OR_NOT: {
+            return 0;
+            break;
+        };
+        case LogicType_XOR: {
             return 0;
             break;
         };
