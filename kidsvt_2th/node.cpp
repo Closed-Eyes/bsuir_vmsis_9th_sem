@@ -7,11 +7,9 @@ Node::Node()
     this->is_constant = false;
     this->is_DType = false;
     this->is_last = false;
-    this->is_under_the_broken = false;
+    this->is_not_DType = false;
     this->name = "Default Node";
 }
-
-
 
 /*
 // -----------------------

@@ -112,130 +112,154 @@ void Tree::setContantValueBrokenElement(int brokenValue)
 
 QList<Node*>* Tree::getTestDataForElement(QString name)
 {
-    Node* brokenElement = this->findElement(name);
-    brokenElement->is_broken = true;
-
-    this->goUpAndMark(brokenElement);
-    return fillTheConstants(new QList<Node*>(), this->topNode);
+    return NULL;
 }
 
-void Tree::goUpAndMark(Node* currentNode)
+//void Tree::goUpAndMark(Node* currentNode)
+//{
+//    Node* nodeToWork = currentNode;
+//    bool canGoUp = true;
+//    while (canGoUp){
+//        if (nodeToWork->is_broken){
+//            if (nodeToWork->is_last){
+//                QList<Node*>* inputs = nodeToWork->input_array;
+//                int reverse_value = 0;
+//                if (this->broken_value == 0)
+//                    reverse_value = 1;
+//                nodeToWork->current_value = this->broken_value;
+//                for (int index = 0; index < inputs->count(); index++){
+//                    Node* downNode = inputs->at(index);
+//                    this->goDownAndSetValues(downNode, reverse_value);
+//                }
+//                canGoUp = false;
+//            }
+//            else {
+//                nodeToWork->current_value = this->broken_value;
+//                this->goDownAndSetValues(nodeToWork, -1);
+//                nodeToWork = nodeToWork->output;
+//            }
+//        }
+//        else {
+//            if (nodeToWork->is_last){
+//                int valueSupport = nodeToWork->valueForwardSupport();
+//                for (int i = 0; i < nodeToWork->input_array->count(); i++){
+//                    Node* inputNode = nodeToWork->input_array->at(i);
+//                    if (!inputNode->is_broken && !inputNode->is_DType){
+//                        inputNode->current_value = valueSupport;
+//                        this->goDownMarkAndCalculate(inputNode);
+//                    }
+//                }
+//                canGoUp = false;
+//            }
+//            else {
+//                nodeToWork->is_DType = true;
+//                int supportValue = nodeToWork->valueForwardSupport();
+//                for (int i = 0; i < nodeToWork->input_array->count(); i++){
+//                    Node* inputNode = nodeToWork->input_array->at(i);
+//                    if (!inputNode->is_broken && !inputNode->is_DType){
+//                        inputNode->current_value = supportValue;
+//                        this->goDownMarkAndCalculate(inputNode);
+//                    }
+//                }
+//                nodeToWork = nodeToWork->output;
+//            }
+//        }
+//    }
+//}
+
+void Tree::saveBrokenWayElement(Node* elementToSave)
 {
-    Node* nodeToWork = currentNode;
-    bool canGoUp = true;
-    while (canGoUp){
-        if (nodeToWork->is_broken){
-            if (nodeToWork->is_last){
-                QList<Node*>* inputs = nodeToWork->input_array;
-                int reverse_value = 0;
-                if (this->broken_value == 0)
-                    reverse_value = 1;
-                nodeToWork->current_value = this->broken_value;
-                for (int index = 0; index < inputs->count(); index++){
-                    Node* downNode = inputs->at(index);
-                    this->goDownAndSetValues(downNode, reverse_value);
-                }
-                canGoUp = false;
-            }
-            else {
-                nodeToWork->current_value = this->broken_value;
-                this->goDownAndSetValues(nodeToWork, -1);
-                nodeToWork = nodeToWork->output;
-            }
-        }
-        else {
-            if (nodeToWork->is_last){
-                int valueSupport = nodeToWork->valueForwardSupport();
-                for (int i = 0; i < nodeToWork->input_array->count(); i++){
-                    Node* inputNode = nodeToWork->input_array->at(i);
-                    if (!inputNode->is_broken && !inputNode->is_DType){
-                        inputNode->current_value = valueSupport;
-                        this->goDownMarkAndCalculate(inputNode);
-                    }
-                }
-                canGoUp = false;
-            }
-            else {
-                nodeToWork->is_DType = true;
-                int supportValue = nodeToWork->valueForwardSupport();
-                for (int i = 0; i < nodeToWork->input_array->count(); i++){
-                    Node* inputNode = nodeToWork->input_array->at(i);
-                    if (!inputNode->is_broken && !inputNode->is_DType){
-                        inputNode->current_value = supportValue;
-                        this->goDownMarkAndCalculate(inputNode);
-                    }
-                }
-                nodeToWork = nodeToWork->output;
-            }
-        }
+    if (this->brokenWayElementsList == NULL){
+        this->brokenWayElementsList = new QList<Node*>();
+    }
+
+    if (!this->brokenWayElementsList->contains(elementToSave)){
+        elementToSave->is_DType = true;
+        this->brokenWayElementsList->append(elementToSave);
     }
 }
 
-// calculate already known values
-void Tree::goDownAndSetValues(Node* currentNode, int valueToSet)
+QList<Node*>* Tree::goUpAndMarkBrokenWay(Node* currentElement)
 {
-    // not node but initial value to the first nodes
-    if (currentNode->is_constant){
-        currentNode->is_under_the_broken = true;
-        currentNode->current_value = valueToSet;
-        return;
+    if (!currentElement->is_broken){
+        Tree::saveBrokenWayElement(currentElement);
+    }
+    else {
+        // broken
+        if (currentElement->is_last)
+            return this->brokenWayElementsList;
+        else
+            Tree::goUpAndMarkBrokenWay(currentElement->output);
     }
 
-    QList<int>* values;
-    if (currentNode->is_broken){
-        int reverseValue = (this->broken_value == 0) ? 1 : 0;
-        values = currentNode->valuesForGettingDeterminedValue(reverseValue);
+    if (currentElement->is_last){
+        return this->brokenWayElementsList;
     }
-    else{
-        currentNode->is_under_the_broken = true;
-        currentNode->current_value = valueToSet;
-        values = currentNode->valuesForGettingDeterminedValue(valueToSet);
-    }
-
-    for (int index = 0; index < currentNode->input_array->count(); index++){
-        Node* oneOfTheChilds = currentNode->input_array->at(index);
-        goDownAndSetValues(oneOfTheChilds, values->at(index));
+    else {
+        Tree::goUpAndMarkBrokenWay(currentElement->output);
     }
 }
+
+//// calculate already known values
+//void Tree::goDownAndMark(Node* currentNode, int valueToSet)
+//{
+//    // not node but initial value to the first nodes
+//    if (currentNode->is_constant){
+//        currentNode->is_not_DType = false;
+//        currentNode->is_DType = false;
+//        return;
+//    }
+
+//    if (!currentNode->is_broken){
+//        currentNode->is_not_DType = true;
+//        currentNode->is_DType = true;
+//    }
+
+//    for (int index = 0; index < currentNode->input_array->count(); index++){
+//        Node* oneOfTheChilds = currentNode->input_array->at(index);
+//        goDownAndSetValues(oneOfTheChilds, values->at(index));
+//    }
+//}
 
 //supporting values - for forwarding
-Node* Tree::goDownMarkAndCalculate(Node* currentNode)
-{
-    if (currentNode->is_constant){
-        return NULL;
-    }
+//Node* Tree::goDownMarkAndCalculate(Node* currentNode)
+//{
+//    if (currentNode->is_constant){
+//        return NULL;
+//    }
 
-    qDebug() << "goDownMarkAndCalculate currentNode " + currentNode->name;
-    if (currentNode->is_DType){
-        int value = currentNode->valueForwardSupport();
-        for (int index = 0; index < currentNode->input_array->count(); index++){
-            Node* childNode = currentNode->input_array->at(index);
-            if (!childNode->is_broken && !childNode->is_DType){
-                childNode->current_value = value;
-                qDebug() << "goDownMarkAndCalculate child_value " + value;
-                this->goDownMarkAndCalculate(childNode);
-            }
-        }
-    }
-    // not forwarded
-    else {
-        qDebug() << "goDownMarkAndCalculate not_forwarded " + currentNode->name;
-        QList<int>* values = currentNode->valuesForGettingDeterminedValue(currentNode->current_value);
-        for (int index = 0; index < currentNode->input_array->count(); index++){
-            Node* childNode = currentNode->input_array->at(index);
-            if (!childNode->is_broken && !childNode->is_DType){
-                childNode->current_value = values->at(index);
-                qDebug() << "goDownMarkAndCalculate valuesForGettingDeterminedValue " + values->at(index);
-                if (!childNode->is_constant)
-                    this->goDownMarkAndCalculate(childNode);
-            }
-        }
-    }
-}
+//    qDebug() << "goDownMarkAndCalculate currentNode " + currentNode->name;
+//    if (currentNode->is_DType){
+//        int value = currentNode->valueForwardSupport();
+//        for (int index = 0; index < currentNode->input_array->count(); index++){
+//            Node* childNode = currentNode->input_array->at(index);
+//            if (!childNode->is_broken && !childNode->is_DType){
+//                childNode->current_value = value;
+//                qDebug() << "goDownMarkAndCalculate child_value " + value;
+//                this->goDownMarkAndCalculate(childNode);
+//            }
+//        }
+//    }
+//    // not forwarded
+//    else {
+//        qDebug() << "goDownMarkAndCalculate not_forwarded " + currentNode->name;
+//        QList<int>* values = currentNode->valuesForGettingDeterminedValue(currentNode->current_value);
+//        for (int index = 0; index < currentNode->input_array->count(); index++){
+//            Node* childNode = currentNode->input_array->at(index);
+//            if (!childNode->is_broken && !childNode->is_DType){
+//                childNode->current_value = values->at(index);
+//                qDebug() << "goDownMarkAndCalculate valuesForGettingDeterminedValue " + values->at(index);
+//                if (!childNode->is_constant)
+//                    this->goDownMarkAndCalculate(childNode);
+//            }
+//        }
+//    }
+//}
 
 Node* Tree::passTreeTopBottom()
 {
     this->passTree(this->topNode, "");
+    return NULL;
 }
 
 Node* Tree::findElement(QString nameElement)
@@ -272,17 +296,17 @@ Node* Tree::passTree(Node* currentNode, QString nameToFind)
     }
 }
 
-QList<Node*>* Tree::fillTheConstants(QList<Node*>* constantList, Node* currentNode)
-{
-    if (currentNode->is_constant){
-        constantList->append(currentNode);
-        return NULL;
-    }
-    else {
-        for (int i = 0; i < currentNode->input_array->count(); i++){
-            Node* nodeGoDown = currentNode->input_array->at(i);
-            this->fillTheConstants(constantList, nodeGoDown);
-        }
-    }
-    return constantList;
-}
+//QList<Node*>* Tree::fillTheConstants(QList<Node*>* constantList, Node* currentNode)
+//{
+//    if (currentNode->is_constant){
+//        constantList->append(currentNode);
+//        return NULL;
+//    }
+//    else {
+//        for (int i = 0; i < currentNode->input_array->count(); i++){
+//            Node* nodeGoDown = currentNode->input_array->at(i);
+//            this->fillTheConstants(constantList, nodeGoDown);
+//        }
+//    }
+//    return constantList;
+//}

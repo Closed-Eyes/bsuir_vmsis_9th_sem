@@ -19,6 +19,7 @@ public:
     QString name;
     int current_value;  // value setted to and need to achieve by using inputs signals
 
+    bool is_not_DType;
     bool is_DType; // supporting part of nodes in the three
     bool is_last;      // top node in hierarchy
     bool is_constant;  // not node but initial values, all is_constant nodes - Test Signals - the result of the app

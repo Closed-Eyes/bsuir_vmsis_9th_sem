@@ -19,14 +19,14 @@ public:
     Node* findElement(QString nameElement);
     Node* passTreeTopBottom();
     Node* passTree(Node* currentNode, QString nameToFind);
-    void goDownAndSetValues(Node* currentNode, int valueToSet);
-    Node* goDownMarkAndCalculate(Node* currentNode);
-    QList<Node*>* fillTheConstants(QList<Node*>* constantList, Node* currentNode);
+
+    void saveBrokenWayElement(Node* elementToSave);
+    QList<Node*>* goUpAndMarkBrokenWay(Node* currentElement);
 
     Node* topNode;
     int broken_value;
     QList<Node*> initialInputs;
-    void goUpAndMark(Node* currentNode);
+    QList<Node*>* brokenWayElementsList;
 };
 
 #endif // TREE_H
