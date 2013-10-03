@@ -173,10 +173,8 @@ void Tree::saveBrokenWayElement(Node* elementToSave)
         this->brokenWayElementsList = new QList<Node*>();
     }
 
-    if (!this->brokenWayElementsList->contains(elementToSave)){
-        elementToSave->is_DType = true;
-        this->brokenWayElementsList->append(elementToSave);
-    }
+    elementToSave->is_DType = true;
+    this->brokenWayElementsList->append(elementToSave);
 }
 
 QList<Node*>* Tree::goUpAndMarkBrokenWay(Node* currentElement)
