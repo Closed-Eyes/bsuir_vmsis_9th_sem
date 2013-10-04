@@ -2,6 +2,7 @@
 #define INSERSECTION_D 9
 #define INSERSECTION_NOT_D 100
 #define INSERSECTION_X 10
+#define INTERSECTION_NULL -100
 
 Node::Node()
 {
@@ -140,22 +141,70 @@ QList<int>* Node::getSingularLine(int line_number)
     return singular_line;
 }
 
-int Node::intersectOperation(int operand1, int operand2)
+int Node::singularIntersectOperation(int operand1, int operand2)
 {
     if (operand1 == 0 && operand2 == 0){
-
+        return 0;
     }
-    else if (operand1 == 0 && operand2 == INSERSECTION_D){
-
+    else if (operand1 == 0 && operand2 == INSERSECTION_X){
+        return 0;
     }
+    else if (operand1 == INSERSECTION_X && operand2 == 0){
+        return 0;
+    }
+    // ------------------------------
+    else if (operand1 == 1 && operand2 == 1){
+        return 1;
+    }
+    else if (operand1 == 1 && operand2 == INSERSECTION_X){
+        return 1;
+    }
+    else if (operand1 == INSERSECTION_X && operand2 == 1){
+        return 1;
+    }
+    else if (operand1 == INSERSECTION_X && operand2 == INSERSECTION_X){
+        return INSERSECTION_X;
+    }
+    // ------------------------------
+    else if (operand1 == 1 && operand2 == 0){
+        return INSERSECTION_D;
+    }
+    else if (operand1 == 0 && operand2 == 1){
+        return INSERSECTION_NOT_D;
+    }
+    // ------------------------------
 }
 
-QList<int>* Node::intersection(QList<int>* line1, QList<int>* line2)
+int  Node::cubeIntersect(int operand1, int operand2){
+    if (operand1 == operand2)
+        return operand1;
+    else if (operand1 == INSERSECTION_X)
+        return operand2;
+    else if (operand2 == INSERSECTION_X)
+        return operand1;
+    return INTERSECTION_NULL;
+}
+
+QList<int>* Node::cubeIntersection(QList<int>* line1, QList<int>* line2)
 {
     QList<int>* intersection_result = new QList<int>();
     for (int index = 0; index < line1->count(); index++){
-        this->intersectOperation(line1->at(index), line2->at(index));
+        int item = this->singularIntersectOperation(line1->at(index), line2->at(index));
+        if (item == INTERSECTION_NULL)
+            return NULL;
+        intersection_result->append(item);
     }
+    return intersection_result;
+}
+
+QList<int>* Node::singularIntersection(QList<int>* line1, QList<int>* line2)
+{
+    QList<int>* intersection_result = new QList<int>();
+    for (int index = 0; index < line1->count(); index++){
+        int item = this->singularIntersectOperation(line1->at(index), line2->at(index));
+        intersection_result->append(item);
+    }
+    return intersection_result;
 }
 
 QList<int>* Node::getDCubesWithNumber(int number)

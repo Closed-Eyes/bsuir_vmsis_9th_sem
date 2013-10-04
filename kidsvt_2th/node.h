@@ -38,8 +38,8 @@ public:
     int amountDCubes();
     QList<int>* getDCubesWithNumber(int number);
     QList<int>* getSingularLine(int line_number);
-    QList<int>* intersection(QList<int>* line1, QList<int>* line2);
-    int intersectOperation(int operand1, int operand2);
+    QList<int>* singularIntersection(QList<int>* line1, QList<int>* line2);
+    int singularIntersectOperation(int operand1, int operand2);
 public:
     Node();
 
