@@ -35,11 +35,17 @@ public:
     QList<int>* zero_indexes;
     QList<int>* one_indexes;
     int calc_amount_DCubes;
+    QList<int>* singular_table_size;
+    QList<int>* singularTable;
+
     int amountDCubes();
     QList<int>* getDCubesWithNumber(int number);
     QList<int>* getSingularLine(int line_number);
     QList<int>* singularIntersection(QList<int>* line1, QList<int>* line2);
     int singularIntersectOperation(int operand1, int operand2);
+
+    int cubeIntersect(int operand1, int operand2);
+    QList<int>* cubeIntersection(QList<int>* line1, QList<int>* line2);
 public:
     Node();
 

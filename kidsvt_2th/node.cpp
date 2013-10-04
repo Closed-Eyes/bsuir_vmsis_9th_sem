@@ -220,9 +220,9 @@ QList<int>* Node::getDCubesWithNumber(int number)
                 int zeroIndex = this->zero_indexes->at(zeroIndex);
 
 
-                QList<int>* singular_line1 = singular_table->at(zeroIndex);
+                QList<int>* singular_line1 = this->singular_table->at(zeroIndex);
                 QList<int>* singular_line2 = singular_table->at(oneIndex);
-                QList<int>* dcube = this->intersection(singular_line1, singular_line2);
+                QList<int>* dcube = this->singularIntersection(singular_line1, singular_line2);
                 return dcube;
             }
             index_number++;
@@ -232,6 +232,10 @@ QList<int>* Node::getDCubesWithNumber(int number)
 }
 QList<int>* Node::singularTableSize()
 {
+    if (this->singular_table_size != NULL){
+        return this->singular_table_size;
+    }
+
     QList<int>* singularTableSizePair = new QList<int>();
     switch (this->elementType){
         case LogicType_OR: {
@@ -267,10 +271,11 @@ QList<int>* Node::singularTableSize()
             break;
         };
         default:{
-            return NULL;
+            singularTableSizePair = NULL;
         }
     }
-    return singularTableSizePair;
+    this->singular_table_size = singularTableSizePair;
+    return this->singlular_table_size;
 }
 
 QList<int>* Node::singularTable()
