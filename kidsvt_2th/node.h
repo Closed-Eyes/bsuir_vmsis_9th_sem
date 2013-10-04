@@ -9,7 +9,10 @@ enum LogicType {LogicType_OR, LogicType_AND, LogicType_AND_NOT,
                 LogicType_OR_NOT, LogicType_THREE_OR_NOT,
                 LogicType_THREE_OR, LogicType_NOT, LogicType_XOR};
 
-enum DTypeValue {DTValueX, DTValue0, DTValue1, DTValueNotD, DTValueD};
+#define INSERSECTION_D 9
+#define INSERSECTION_NOT_D 100
+#define INSERSECTION_X 10
+
 
 class Node
 {
@@ -33,7 +36,10 @@ public:
     QList<int>* one_indexes;
     int calc_amount_DCubes;
     int amountDCubes();
-    QList* getDCubesWithNumber(int number);
+    QList<int>* getDCubesWithNumber(int number);
+    QList<int>* getSingularLine(int line_number);
+    QList<int>* intersection(QList<int>* line1, QList<int>* line2);
+    int intersectOperation(int operand1, int operand2);
 public:
     Node();
 

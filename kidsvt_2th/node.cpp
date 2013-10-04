@@ -1,4 +1,7 @@
 #include "node.h"
+#define INSERSECTION_D 9
+#define INSERSECTION_NOT_D 100
+#define INSERSECTION_X 10
 
 Node::Node()
 {
@@ -121,12 +124,38 @@ int Node::amountDCubes()
     return this->calc_amount_DCubes;
 }
 
-QList<int>* getSingularLine(bool zeroMode)
+QList<int>* Node::getSingularLine(int line_number)
 {
     QList<int>* singular_table_size = this->singularTableSize();
     QList<int>* singular_table = this->singularTable();
-\
 
+    int str = singular_table_size->at(0);
+    int col = singular_table_size->at(1);
+
+    QList<int>* singular_line = new QList<int>();
+    for (int item_index = 0; item_index < col; item_index++){
+        int item = singular_table->at(line_number * col + item_index);
+        singular_line->append(item);
+    }
+    return singular_line;
+}
+
+int Node::intersectOperation(int operand1, int operand2)
+{
+    if (operand1 == 0 && operand2 == 0){
+
+    }
+    else if (operand1 == 0 && operand2 == INSERSECTION_D){
+
+    }
+}
+
+QList<int>* Node::intersection(QList<int>* line1, QList<int>* line2)
+{
+    QList<int>* intersection_result = new QList<int>();
+    for (int index = 0; index < line1->count(); index++){
+        this->intersectOperation(line1->at(index), line2->at(index));
+    }
 }
 
 QList<int>* Node::getDCubesWithNumber(int number)
@@ -142,13 +171,15 @@ QList<int>* Node::getDCubesWithNumber(int number)
                 int zeroIndex = this->zero_indexes->at(zeroIndex);
 
 
-                singular_table->at(zeroIndex);
-                singular_table->at(oneIndex);
-                break;
+                QList<int>* singular_line1 = singular_table->at(zeroIndex);
+                QList<int>* singular_line2 = singular_table->at(oneIndex);
+                QList<int>* dcube = this->intersection(singular_line1, singular_line2);
+                return dcube;
             }
             index_number++;
         }
     }
+    return NULL;
 }
 QList<int>* Node::singularTableSize()
 {
