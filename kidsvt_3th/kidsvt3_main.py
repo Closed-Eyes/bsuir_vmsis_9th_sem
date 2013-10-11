@@ -18,14 +18,16 @@ def calcLogicFunctions(nodeName, args):
 
 def calcOr(args):
 	return (args[0] | args[1])
-def calcNot(arg):
-	if (arg == 0):
+def calcNot(args):
+	if (args == 0):
 		return 1
 	else:
 		return 0
 def calcThreeOr(args):
         return (args[0] | args[1] | args[2])
 def calcXor(args):
+	print (args)
+	exit()
         return (args[0] ^ args[1])
 def calcAndNot(args):
         result = (args[0] & args[1])
@@ -43,23 +45,76 @@ def calcOrNot(args):
 
 ############# Generation of test combos
 
+def getTestInputListFromBinary(string):
+	list = []
+	string = str(string) 
+	for char in string:
+		list.append(char)
+	return list
+
 def generateAllTestCombos():
-	initialCombo = 255
-	for index in range(0, 255):
+	initialCombo = 127
+	allTestList = []
+	for index in range(0, 127):
 		stringRepresentation = str(bin(initialCombo))
 		additionalZeroCount = int(8 + 2) - len(stringRepresentation)
 		if (additionalZeroCount > 0):
 			for zeroNumber in range(1, int(additionalZeroCount)):
 				stringRepresentation = str(stringRepresentation) + str('0') 
-		print stringRepresentation
+		currentList = getTestInputListFromBinary(stringRepresentation)
+		allTestList.append(currentList)
 		initialCombo = initialCombo - 1
+	return allTestList
 
 ############# Get scheme output 
 
+def isItemInList(item, list):
+	for currentItem in list :
+		if (currentItem == item):
+			return True
+	return False 
+
+def getConstantInputsWithNameList(inputs, someInputs):
+	valuesToReturn = []
+	
+	for someInp in someInputs:
+		counter = 0
+		for key in GLInputs :
+			if key == someInp :
+				valuesToReturn.append(inputs[counter])
+			counter = int(counter) + 1
+	return valuesToReturn
+		
+	
+
 def getSchemeOutput(inputs, brokenName, brokenType):
-	GLConnectionsDown
-	GLConnectionsUp
-	for input in GLInputs 
+	currentNodeName = ''
+	calculatedValues = dict()
+	usedNodes = list()
+	print GLConnectionsDown
+	for node, nodeInputs in GLConnectionsDown.items():
+		collectedInputsOfNode = []
+		
+		print node
+		print nodeInputs
+		
+		if (node == brokenName):
+			calculatedValues[brokenName] = brokenType
+			continue
+		for currentInput in nodeInputs:
+			if (isItemInList(currentInput, GLInputs)):
+				usedNodes.append(currentInput)
+				collectedInputsOfNode.append(currentInput)
+			else:
+				if (isItemInList(currentInput, calculatedValues)):
+					collectedInputsOfNode.append(currentInput)
+		
+		if (len(nodeInputs) == len(collectedInputsOfNode)):
+			print collectedInputsOfNode
+			getConstantInputsWithNameList(inputs, collectedInputsOfNode)
+			calculatedValues[node] = calcLogicFunctions(node, )
+			
+	#print calculatedValues				 
 
 ############# TEST Elements functions
 
@@ -81,7 +136,7 @@ args24 = array('i', [1, 1])
 
 args11 = 1
 args12 = 0
-
+a ="""
 print "TEST F1"
 print calcLogicFunctions("F1", args21)
 print calcLogicFunctions("F1", args22)
@@ -119,5 +174,9 @@ print calcLogicFunctions("F6", args21)
 print calcLogicFunctions("F6", args22)
 print calcLogicFunctions("F6", args23)
 print calcLogicFunctions("F6", args24)
+"""
+print "============================================="
 
-generateAllTestCombos()
+#print  getConstantInputsWithNameList (GLInputs, [0, 1, 0, 1, 0, 1, 0], ['x1',  'x2',  'x4'])
+allTestComboListOfLists = generateAllTestCombos()
+getSchemeOutput(allTestComboListOfLists[0], "F1", 1)

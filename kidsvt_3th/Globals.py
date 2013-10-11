@@ -1,8 +1,8 @@
 ####! /usr/bin/env python
 #############################################
 
-from enum import Enum
-GLNodeCrasheType = Enum('HighCrash', 'LowCrash', 'BothCrash')
+#from enum import Enum
+#GLNodeCrasheType = Enum('HighCrash', 'LowCrash', 'BothCrash')
 
 GLNodes = ['F1', "F2", "F3", "F4", "F5", "F6"]
 GLInputs = ['x1', "x2", "x3", "x4", "x5", "x6", "x7"];
@@ -19,4 +19,3 @@ GLLastNode = "F6";
 
 GLNodesTypeList = {"F1":"OR", "F2":"NOT", "F3":"XOR", "F4":"THREE_OR",
                   "F5": "AND_NOT", "F6": "OR_NOT"}
-
