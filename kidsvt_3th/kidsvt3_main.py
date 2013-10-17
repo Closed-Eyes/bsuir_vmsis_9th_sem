@@ -3,6 +3,7 @@
 from ComboMaxCover import *
 from Globals import *
 from LogicElements import *
+from SwitchesCalculating import *
 
 def getStringFromBinary(bin_number):
 	stringBin = str(bin_number)
@@ -248,17 +249,40 @@ print comboListToCover
 for combination in comboListToCover:
 	print testCover[combination]
 
+
+allSwitchesDictionary = dict()
+
 counter = 0
 previous = ''
 current = ''
-for combination in comboListToCover:
-	if (counter == 0):
-		previous = getTestInputListFromBinary(combination)
-		counter = counter + 1
-		continue
-	else:
-		counter = counter + 1
-		current = getTestInputListFromBinary(combination)
-	print "previous " + str(previous) + " current " + str(current) + " "
-	print "diff " + str(switchesDifference(previous, current))
-	previous = current
+for combination1 in comboListToCover:
+	for combination2 in comboListToCover:
+		if (combination1 == combination2):
+			continue
+		previous = getTestInputListFromBinary(combination1)
+		current = getTestInputListFromBinary(combination2)
+		diff = switchesDifference(previous, current)
+		key = combination1 + "+" + combination2
+		allSwitchesDictionary[key] = diff
+
+print "Resul combination table pair - switches count"
+for key, value in allSwitchesDictionary.items():
+ 	print "key " + key + " value " + str(value)
+
+counter = 0
+switches = 0
+indexVar = 1
+result = getAngryComboSequence(allSwitchesDictionary)
+lastPair = []
+previous = 0
+
+print "\n\nVuala! See result below!\n"
+
+for item in result:
+	twoPairList = getTwoStrListFromStr(item[0])
+	if (previous != twoPairList[0]):
+		print "combination: " + twoPairList[0]
+	print "combination: " + twoPairList[1]
+	previous = twoPairList[1]
+	switches = switches + int(item[1])
+print "\n Switch's amount = " + str(switches)
