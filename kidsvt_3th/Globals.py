@@ -4,10 +4,16 @@
 #from enum import Enum
 #GLNodeCrasheType = Enum('HighCrash', 'LowCrash', 'BothCrash')
 
+def myprint(toPrint):
+    if (GLDebug == 1):
+        print toPrint
+
+GLDebug = 0;
+
 GLNodes = ['F1', "F2", "F3", "F4", "F5", "F6"]
 GLInputs = ['x1', "x2", "x3", "x4", "x5", "x6", "x7"];
 
-GLConnectionsDown = {    "F1": ["x1", "x2"], "F2": "x3", "F3":["x5", "x6"],
+GLConnectionsDown = {    "F1": ["x1", "x2"], "F2": ["x3"], "F3":["x5", "x6"],
                         "F4": ["x4", "F3", "x7"], "F5": ["F2", "F4"],
                         "F6": ["F1", "F5"]}
 

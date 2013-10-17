@@ -1,82 +1,44 @@
 #! /usr/bin/env python
 
-from array import *
+from ComboMaxCover import *
 from Globals import *
+from LogicElements import *
 
-def calcLogicFunctions(nodeName, args):
-	realLogicFunctions = {"OR" : calcOr,
-           "NOT" : calcNot,
-           "XOR" : calcXor,
-           "THREE_OR" : calcThreeOr,
-           "AND_NOT" : calcAndNot,
-           "OR_NOT" : calcOrNot
-	}
-	elementType = GLNodesTypeList[nodeName]
-	return realLogicFunctions[elementType](args)
-#element_type = names_to_types[node_name]
-#return real_logic_functions[element_type](args)
-
-def calcOr(args):
-	return (args[0] | args[1])
-def calcNot(args):
-	if (args == 0):
-		return 1
-	else:
-		return 0
-def calcThreeOr(args):
-        return (args[0] | args[1] | args[2])
-def calcXor(args):
-	print (args)
-	exit()
-        return (args[0] ^ args[1])
-def calcAndNot(args):
-        result = (args[0] & args[1])
-	if (result == 0):
-		return 1
-	else:
-		return 0
-		
-def calcOrNot(args):
-        result = (args[0] | args[1])
-	if (result == 0):
-                return 1
-        else:
-                return 0 
-
-############# Generation of test combos
+def getStringFromBinary(bin_number):
+	stringBin = str(bin_number)
+	stringRes = ""
+	counter = 0
+	for char in stringBin:
+		if (counter >= 2):
+			stringRes = stringRes + char
+		counter = counter + 1
+	return stringRes
 
 def getTestInputListFromBinary(string):
-	list = []
-	string = str(string) 
+	comboList = []
 	for char in string:
-		list.append(char)
-	return list
+		comboList.append(char)
+	return comboList
 
 def generateAllTestCombos():
-	initialCombo = 127
 	allTestList = []
-	for index in range(0, 127):
-		stringRepresentation = str(bin(initialCombo))
-		additionalZeroCount = int(8 + 2) - len(stringRepresentation)
+	for index in range(0, 128):
+		stringRepresentation = getStringFromBinary(bin(index))
+		#print stringRepresentation
+		additionalZeroCount = int(7) - len(stringRepresentation)
+		#print additionalZeroCount
 		if (additionalZeroCount > 0):
-			for zeroNumber in range(1, int(additionalZeroCount)):
-				stringRepresentation = str(stringRepresentation) + str('0') 
+			for zeroNumber in range(0, int(additionalZeroCount)):
+				stringRepresentation = str('0') + str(stringRepresentation)
+		#print stringRepresentation
 		currentList = getTestInputListFromBinary(stringRepresentation)
 		allTestList.append(currentList)
-		initialCombo = initialCombo - 1
 	return allTestList
 
-############# Get scheme output 
-
-def isItemInList(item, list):
-	for currentItem in list :
-		if (currentItem == item):
-			return True
-	return False 
-
+############# Get scheme output
 def getConstantInputsWithNameList(inputs, someInputs):
 	valuesToReturn = []
-	
+
 	for someInp in someInputs:
 		counter = 0
 		for key in GLInputs :
@@ -84,38 +46,92 @@ def getConstantInputsWithNameList(inputs, someInputs):
 				valuesToReturn.append(inputs[counter])
 			counter = int(counter) + 1
 	return valuesToReturn
-		
-	
 
 def getSchemeOutput(inputs, brokenName, brokenType):
 	currentNodeName = ''
 	calculatedValues = dict()
 	usedNodes = list()
-	print GLConnectionsDown
+
+	myprint (GLConnectionsDown)
 	for node, nodeInputs in GLConnectionsDown.items():
-		collectedInputsOfNode = []
-		
-		print node
-		print nodeInputs
-		
+		collectedConstants = []
+		collectedValues = []
+		myprint ("\n\ncurrentNode" + str(node))
+		#print nodeInputs
 		if (node == brokenName):
 			calculatedValues[brokenName] = brokenType
+			myprint( "brokenName " + brokenName)
 			continue
 		for currentInput in nodeInputs:
-			if (isItemInList(currentInput, GLInputs)):
+			#print "currentInput " + currentInput
+			if (currentInput in GLInputs):
+				#print "   YES inList of GLInputs"
 				usedNodes.append(currentInput)
-				collectedInputsOfNode.append(currentInput)
+				collectedConstants.append(currentInput)
 			else:
-				if (isItemInList(currentInput, calculatedValues)):
-					collectedInputsOfNode.append(currentInput)
-		
-		if (len(nodeInputs) == len(collectedInputsOfNode)):
-			print collectedInputsOfNode
-			getConstantInputsWithNameList(inputs, collectedInputsOfNode)
-			calculatedValues[node] = calcLogicFunctions(node, )
-			
-	#print calculatedValues				 
+				if (currentInput in calculatedValues):
+					valueToCollect = calculatedValues[currentInput]
+					collectedValues.append(valueToCollect)
+		myprint ("collectedValues" + str(collectedConstants))
+		if (len(nodeInputs) == len(collectedConstants) + len(collectedValues)):
+			# collectedInputsOfNode - has names of inputs
+			#print collectedConstants
+			#print collectedValues
+			args = getConstantInputsWithNameList(inputs, collectedConstants)
+			#print "args before merge: " + str(args)
+			if (len(collectedValues) > 0):
+				args = args + collectedValues
+			#print "args after merge " + str(args)
+			#print calcLogicFunctions(node, args)
+			calculatedValues[node] = calcLogicFunctions(node, args)
+			myprint ("calculatedValues[node] " + str(calculatedValues[node]))
+			#print calculatedValues
+	#print calculatedValues
+	return calculatedValues[GLLastNode]
 
+def getSchemeNodesValues(inputs):
+	currentNodeName = ''
+	calculatedValues = dict()
+	usedNodes = list()
+
+	myprint (GLConnectionsDown)
+	for node, nodeInputs in GLConnectionsDown.items():
+		collectedConstants = []
+		collectedValues = []
+		myprint ("\n\ncurrentNode" + str(node))
+		#print nodeInputs
+		for currentInput in nodeInputs:
+			#print "currentInput " + currentInput
+			if (currentInput in GLInputs):
+				#print "   YES inList of GLInputs"
+				usedNodes.append(currentInput)
+				collectedConstants.append(currentInput)
+			else:
+				if (currentInput in calculatedValues):
+					valueToCollect = calculatedValues[currentInput]
+					collectedValues.append(valueToCollect)
+		myprint ("collectedValues" + str(collectedConstants))
+		if (len(nodeInputs) == len(collectedConstants) + len(collectedValues)):
+			# collectedInputsOfNode - has names of inputs
+			#print collectedConstants
+			#print collectedValues
+			args = getConstantInputsWithNameList(inputs, collectedConstants)
+			#print "args before merge: " + str(args)
+			if (len(collectedValues) > 0):
+				args = args + collectedValues
+			#print "args after merge " + str(args)
+			#print calcLogicFunctions(node, args)
+			calculatedValues[node] = calcLogicFunctions(node, args)
+			myprint ("calculatedValues[node] " + str(calculatedValues[node]))
+			#print calculatedValues
+	#print calculatedValues
+	return calculatedValues
+
+def listToString(listToChange):
+	string = ""
+	for char in listToChange:
+		string = string + char
+	return string
 ############# TEST Elements functions
 
 
@@ -133,7 +149,6 @@ args21 = array('i', [0, 0])
 args22 = array('i', [0, 1])
 args23 = array('i', [1, 0])
 args24 = array('i', [1, 1])
-
 args11 = 1
 args12 = 0
 a ="""
@@ -178,5 +193,42 @@ print calcLogicFunctions("F6", args24)
 print "============================================="
 
 #print  getConstantInputsWithNameList (GLInputs, [0, 1, 0, 1, 0, 1, 0], ['x1',  'x2',  'x4'])
-allTestComboListOfLists = generateAllTestCombos()
-getSchemeOutput(allTestComboListOfLists[0], "F1", 1)
+allTestCombo = generateAllTestCombos()
+print allTestCombo
+
+#print allTestCombo[0]
+
+testCover = dict()
+testCoverStat = dict()
+for currentCombo in allTestCombo:
+	rightOutput = getSchemeOutput(currentCombo, "R", 0)
+	currentComboCover = dict()
+	coverCounter = 0
+	for currentNode in GLNodes:
+		incorrect1 = getSchemeOutput(currentCombo, currentNode, 1)
+		incorrect0 = getSchemeOutput(currentCombo, currentNode, 0)
+		currentNodeCover = list()
+		if (int(incorrect1) != int(rightOutput)):
+			currentNodeCover.append(1)
+		if (int(incorrect0) != int(rightOutput)):
+			currentNodeCover.append(0)
+		if (len(currentNodeCover) > 0):
+			currentComboCover[currentNode] = currentNodeCover
+			coverCounter = coverCounter + 1
+		else:
+			currentComboCover[currentNode] = "-"
+	if (coverCounter > 0):
+		key = listToString(currentCombo)
+		testCover[key] = currentComboCover
+		testCoverStat[key] = coverCounter
+
+# print len(testCover.items())
+for item in testCover.items():
+ 	print item
+######################
+comboListToCover = getFullCoverCombos(testCover, testCoverStat)
+print "\n result full cover tests"
+print comboListToCover
+
+for combination in comboListToCover:
+	print testCover[combination]
