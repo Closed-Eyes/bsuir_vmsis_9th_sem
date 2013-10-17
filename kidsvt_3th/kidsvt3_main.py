@@ -127,6 +127,21 @@ def getSchemeNodesValues(inputs):
 	#print calculatedValues
 	return calculatedValues
 
+def switchesDifference(previousInput, currentInput):
+	previousValues = getSchemeNodesValues(previousInput)
+	currentValues = getSchemeNodesValues(currentInput)
+	print "previousValues " + str(previousValues)
+	print "currentValues " + str(currentValues)
+
+
+	differences = 0
+	for key, previousValue in previousValues.items():
+		currentValue = currentValues[key]
+		if (int(previousValue) != int(currentValue)):
+			differences = differences + 1
+	return differences
+
+
 def listToString(listToChange):
 	string = ""
 	for char in listToChange:
@@ -232,3 +247,18 @@ print comboListToCover
 
 for combination in comboListToCover:
 	print testCover[combination]
+
+counter = 0
+previous = ''
+current = ''
+for combination in comboListToCover:
+	if (counter == 0):
+		previous = getTestInputListFromBinary(combination)
+		counter = counter + 1
+		continue
+	else:
+		counter = counter + 1
+		current = getTestInputListFromBinary(combination)
+	print "previous " + str(previous) + " current " + str(current) + " "
+	print "diff " + str(switchesDifference(previous, current))
+	previous = current
