@@ -82,7 +82,7 @@ for testCombo in allTestCombo:
         continue
     sequences = computeAllSequences(testCombo)
 
-    print "\n\nInitialState " + str(testCombo) + ""
+    print "\nInitialState " + str(testCombo) + ""
     #print "initial sequences\n"
     #printListNice(sequences)
 
@@ -94,10 +94,8 @@ for testCombo in allTestCombo:
         result = getFullCoverCombosForSequence(testCover, testCoverStat, sequences)
         if (result != 0):
             print "Save results"
-            print allResults.append(result)
+            allResults.append(result)
             print result
-        else:
-            print "Nothing to save results"
 
 print "\n\nAll sequences with full cover"
 printListNice(allResults)
