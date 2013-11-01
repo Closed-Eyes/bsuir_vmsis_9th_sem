@@ -151,5 +151,5 @@ def switchesDifference(previousInput, currentInput):
 def listToString(listToChange):
 	string = ""
 	for char in listToChange:
-		string = string + char
+		string = string + str(char)
 	return string

@@ -23,6 +23,14 @@ def getCoverOfCombo(globalHigh, globalLow, testCover, combination, coverCount):
                 return currentCoverCount
 
 def getTestCover(allTestCombo):
+
+    for i in range(len(allTestCombo)):
+        for j in range(len(allTestCombo[i])):
+            allTestCombo[i][j] = str(allTestCombo[i][j])
+
+    #print allTestCombo
+    #exit()
+
     testCover = dict()
     testCoverStat = dict()
     for currentCombo in allTestCombo:
@@ -43,6 +51,7 @@ def getTestCover(allTestCombo):
             else:
                 currentComboCover[currentNode] = "-"
         if (coverCounter > 0):
+
             key = listToString(currentCombo)
             testCover[key] = currentComboCover
             testCoverStat[key] = coverCounter
@@ -58,6 +67,7 @@ def getFullCoverCombosForSequence(testCover, testCoverStat, sequences):
 
     for combination in sequences:
         #print "combination " + combination
+        combination = listToString(combination)
         coverCount = testCoverStat[combination]
         if (globalBreakCount == 0):
             break

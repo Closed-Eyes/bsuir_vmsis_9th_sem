@@ -24,34 +24,51 @@ def shiftSequences(sequences):
     return newSequences
 
 def computeNextState(currentState):
-    #print "... " + str(currentState)
+    print "... " + str(currentState)
     previousState = currentState
 
-    counter = 6
-    while (counter >= 0):
-        if (counter > 0):
-            currentState[counter] = currentState[counter - 1]
-        counter = counter - 1
-    insertedValue = int(previousState[6]) ^ int(previousState[5])
-    insertedValue = int(insertedValue) ^ int(previousState[4]) ^ int(previousState[3]);
-    insertedValue = int(insertedValue) ^ int(previousState[1]) ^ int(previousState[0]);
-    currentState[0] = int(insertedValue)
-    #print "currentState" + str(currentState) + " previous: " + str(previousState)
+    polinom = [1, 1, 1, 1, 0, 1, 1]
+    
+    #polinom.reverse()
+
+    temp = currentState[6];
+
+    currentState[6] = int(currentState[5])
+    currentState[5] = int(currentState[4])
+    currentState[4] = int(currentState[3])
+    currentState[3] = int(currentState[2])
+    currentState[2] = int(currentState[1])
+    currentState[1] = int(currentState[0])
+    currentState[0] = int(temp)
+
+    for i in range(7):
+        currentState[i] = currentState[i] & polinom[i]
+
+    result = currentState[0]
+
+    for i in range(1, 7):
+        result = result ^ currentState[i]
+
+    currentState[0] = result;
     return currentState
 
 def convertFirstState(state):
-    listState = list();
-    for char in state:
-        t = int(char)
-        listState.append(t)
+    listState = [0,0,0,0,0,0,0];
+    listState[0] = int(state[0])
+    listState[1] = int(state[1])
+    listState[2] = int(state[2])
+    listState[3] = int(state[3])
+    listState[4] = int(state[4])
+    listState[5] = int(state[5])
+    listState[6] = int(state[6])
     return listState
 
 def computeAllSequences(firstState):
     allStates = list()
     #print firstState
 
-
     currentState = convertFirstState(firstState)
+
     canGo = "YES"
     while (canGo == "YES"):
         if (getStringFromList(currentState) in allStates):
@@ -59,7 +76,7 @@ def computeAllSequences(firstState):
         else:
             allStates.append(getStringFromList(currentState))
             currentState = computeNextState(currentState)
-            #print "new current state: " + str(currentState)
+            print "new current state: " + str(currentState)
     return allStates
 
 print "Generating all test combinations"
@@ -70,6 +87,8 @@ print "Calculating test cover by each combination"
 characteristics = getTestCover(allTestCombo)
 testCover = characteristics[0]
 testCoverStat = characteristics[1]
+
+
 
 skipZeroCombo = 1
 allSequences = list()
@@ -87,11 +106,13 @@ for testCombo in allTestCombo:
     #printListNice(sequences)
 
     shiftLength = len(sequences)
+    print shiftLength;
     while (shiftLength != 0):
         shiftLength = shiftLength - 1
         #print "shifted\n"
         sequences = shiftSequences(sequences)
         result = getFullCoverCombosForSequence(testCover, testCoverStat, sequences)
+        exit()
         if (result != 0):
             print "Save results"
             allResults.append(result)
