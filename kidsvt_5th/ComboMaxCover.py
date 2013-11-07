@@ -22,6 +22,7 @@ def getCoverOfCombo(globalHigh, globalLow, testCover, combination, coverCount):
 #                 print "\n"
                 return currentCoverCount
 
+#return list of 2 dict
 def getTestCover(allTestCombo):
 
     for i in range(len(allTestCombo)):

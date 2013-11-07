@@ -53,6 +53,9 @@ def getConstantInputsWithNameList(inputs, someInputs):
 			counter = int(counter) + 1
 	return valuesToReturn
 
+# inputs - list of values 0-1, list length 7
+# brokenName - name of broken node F1-F6
+# brokenType - 0, 1 constant value on the output
 def getSchemeOutput(inputs, brokenName, brokenType):
 	currentNodeName = ''
 	calculatedValues = dict()
