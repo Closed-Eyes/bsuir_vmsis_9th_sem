@@ -145,6 +145,81 @@ def generateLSequence():
 		l_sequence[index] = randrange(0, 2)
 	return l_sequence
 
+def calculateFromSide(row_ind, v2_row, width, storage, reverted):
+# 	print row_ind, " ", v2_row, " ", width, " ", storage, " ",  reverted
+	operand = -1
+	for j in range(0, width):
+		revert_j = int ((width - 1) - j)
+		use = int(j);
+		if (reverted == True):
+			use = revert_j
+
+# 		print "use " + str(use)
+		if (v2_row[use] == 1):
+			if (operand == -1):
+				operand = storage[use]
+			else:
+				operand = operand ^ storage[use]
+# 			print "operand setVal" + str(operand)
+
+		if ((use == row_ind - 1) and (reverted == True)):
+			return operand
+		else:
+			if ((use == row_ind - 1) and (reverted == False)):
+				return operand
+	return operand
+
+def getNextSAZipperState(V2, s1_element, s2_element, storage_m):
+	storage = list(storage_m)
+
+	channel1_index = 0
+	channel2_index = 1
+
+	width_v2 = len(V2)
+
+	next_storage_state = list(storage)
+	for i in range(0, width_v2):
+		v2_row = V2[i]
+# 		print "v2_row " + str(v2_row)
+# 		print i
+
+		operand1 = calculateFromSide(i, v2_row, width_v2, storage, True)
+		operand2 = calculateFromSide(i, v2_row, width_v2, storage, False)
+# 		print "calc_result operand1" + str(int(operand1))
+# 		print "calc_result operand2" + str(int(operand2))
+		result = -1
+		if (operand1 == -1):
+			result = int(operand2)
+		else:
+			if (operand2 == -1):
+				result = int(operand1)
+			else:
+				result = int(operand1) ^ int(operand2)
+# 		print "result " + str(result)
+		if (i == channel1_index):
+			result = result ^ s1_element
+		if (i == channel2_index):
+			result = result ^ s2_element
+# 		print "final result " + str(result)
+		next_storage_state[i] = result
+	return next_storage_state
+
+# V2 - arraym containing info about mod2 connections
+# s1, s2 - 2 sequences to zip
+def genSA2Channels(V2, s):
+	length_of_sa_zipper = 8
+	storage = [0] * length_of_sa_zipper
+
+	next_storage_state = list(storage)
+	counter = 0
+	for index in range(0, len(s) / 2):
+		if (counter <= (len(s) - 1) - 4):
+			s1_element = s[counter]
+			s2_element = s[counter + 2]
+			next_storage_state = getNextSAZipperState(V2, s1_element, s2_element, next_storage_state)
+			counter = counter + 4
+	return next_storage_state
+
 #moving one in zeros list
 def generateNextLevelMask(l_length, mask):
 	masks_next_level = list()
@@ -168,7 +243,7 @@ def mask(breaks_num, l_length):
 	### because of great time need to perform 4th level
 	### we set limit in 5000 results for checkings
 
-	LIMIT = 20000
+	LIMIT = 5000
 
 	mask = [0] * l_length
 
@@ -199,6 +274,19 @@ def mask(breaks_num, l_length):
 			level = level + 1
 	return next_level_mask
 
+def check2chSAOnErrorLevel(error_level, v2, masks, l_sequence):
+	mask_mistakes = 0
+
+	for m_item in masks:
+		broken_sequence = putMistakesWithMask(l_sequence, m_item)
+
+		right_sa = genSA2Channels(v2, l_sequence)
+		wrong_sa = genSA2Channels(v2, broken_sequence)
+	# 	print str(right_sa) + " " + str(wrong_sa)
+		if (isSignaturesEqual(right_sa, wrong_sa) == True):
+			mask_mistakes = mask_mistakes + 1
+	print "Errors in sequence " + str(error_level) + ": " + str(mask_mistakes) + "/" + str(len(masks))
+
 def checkSAOnErrorLevel(error_level, polynom, masks, l_sequence):
 	mask_mistakes = 0
 	for m_item in masks:
@@ -211,22 +299,79 @@ def checkSAOnErrorLevel(error_level, polynom, masks, l_sequence):
 			mask_mistakes = mask_mistakes + 1
 	print "Errors in sequence " + str(error_level) + ": " + str(mask_mistakes) + "/" + str(len(masks))
 
+def getColumn(matrix, index):
+	column_result = []
+	for i in range(0, len(matrix)):
+		row = matrix[i]
+		column_result.append(row[index])
+	return column_result
 
-polynom = [0, 1, 1, 0, 1, 0, 0, 1]
+def power2(matrix):
+	result_matrix = []
+	for i in range(0, len(matrix)):
+		row_in_matrix = []
+		row = matrix[i]
+		for j in range(0, len(matrix)):
+			column = getColumn(matrix, j)
+			item = 0
+			for v in range(0, len(matrix)):
+				item = item + column[v] * row[v]
+			row_in_matrix.append(item)
+		result_matrix.append(row_in_matrix)
+	return result_matrix
+
+poly =  [0, 1, 1, 0, 1, 0, 0, 1]
+row2 =  [1, 0, 0, 0, 0, 0, 0, 0]
+row3 =  [0, 1, 0, 0, 0, 0, 0, 0]
+row4 =  [0, 0, 1, 0, 0, 0, 0, 0]
+row5 =  [0, 0, 0, 1, 0, 0, 0, 0]
+row6 =  [0, 0, 0, 0, 1, 0, 0, 0]
+row7 =  [0, 0, 0, 0, 0, 1, 0, 0]
+row8 =  [0, 0, 0, 0, 0, 0, 1, 0]
+
+matrix = []
+matrix.append(poly)
+matrix.append(row2)
+matrix.append(row3)
+matrix.append(row4)
+matrix.append(row5)
+matrix.append(row6)
+matrix.append(row7)
+matrix.append(row8)
+
+# generate V^2. V2 related to mod2 location and connections
+v2 = power2(matrix)
+# for row in v2:
+# 	print row
+
+l_sequence = generateLSequence()
+l_length = len(l_sequence)
+
+sa_2ch = [0] * 8
+for index in range(0, len(l_sequence)):
+	item = l_sequence[index]
+	sa_2ch = getNextSAZipperState(v2, item, item, sa_2ch)
+	print sa_2ch
+
 # polynom = [1, 0, 0, 1, 0, 1, 1, 0]
 
 # right sequence to compare with
-l_sequence = generateLSequence()
-l_length = len(l_sequence)
 
 masks1 = mask(1, l_length)
 masks2 = mask(2, l_length)
 masks3 = mask(3, l_length)
 masks4 = mask(4, l_length)
 
-checkSAOnErrorLevel(1, polynom, masks1, l_sequence)
-checkSAOnErrorLevel(2, polynom, masks2, l_sequence)
-checkSAOnErrorLevel(3, polynom, masks3, l_sequence)
-checkSAOnErrorLevel(4, polynom, masks4, l_sequence)
+print "\n1 channel"
+checkSAOnErrorLevel(1, poly, masks1, l_sequence)
+checkSAOnErrorLevel(2, poly, masks2, l_sequence)
+checkSAOnErrorLevel(3, poly, masks3, l_sequence)
+checkSAOnErrorLevel(4, poly, masks4, l_sequence)
+
+print "\n2 channels"
+check2chSAOnErrorLevel(1, v2, masks1, l_sequence)
+check2chSAOnErrorLevel(2, v2, masks2, l_sequence)
+check2chSAOnErrorLevel(3, v2, masks3, l_sequence)
+check2chSAOnErrorLevel(4, v2, masks4, l_sequence)
 
 exit()
