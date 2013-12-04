@@ -15,4 +15,13 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    memory.cpp \
+    constants.h \
+    import.h \
+    errors_simulation.cpp \
+    file_output.cpp \
+    memoryscheme.cpp
+
+HEADERS += \
+    memoryscheme.h
