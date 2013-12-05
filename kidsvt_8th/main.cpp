@@ -27,16 +27,16 @@ void generateFaults()
                     }
                     else {
                         faults[row][column] = ANPSFK9;
-                        faults_links[row - 1][column] = TOP_MIDDLE;
-                        faults_links[row - 1][column - 1] = TOP_LEFT;
-                        faults_links[row - 1][column + 1] = TOP_RIGHT;
+                        faults_links[row - 1][column] = APN_TOP_MIDDLE;
+                        faults_links[row - 1][column - 1] = APN_TOP_LEFT;
+                        faults_links[row - 1][column + 1] = APN_TOP_RIGHT;
 
-                        faults_links[row][column + 1] = RIGHT_MIDDLE;
-                        faults_links[row][column - 1] = LEFT_MIDDLE;
+                        faults_links[row][column + 1] = APN_RIGHT_MIDDLE;
+                        faults_links[row][column - 1] = APN_LEFT_MIDDLE;
 
-                        faults_links[row + 1][column] = BOTTOM_MIDDLE;
-                        faults_links[row + 1][column - 1] = BOTTOM_LEFT;
-                        faults_links[row + 1][column + 1] = BOTTOM_RIGHT;
+                        faults_links[row + 1][column] = APN_BOTTOM_MIDDLE;
+                        faults_links[row + 1][column - 1] = APN_BOTTOM_LEFT;
+                        faults_links[row + 1][column + 1] = APN_BOTTOM_RIGHT;
                         anpsfk++;
                     }
                     setPN = !setPN;
@@ -46,8 +46,8 @@ void generateFaults()
     }
 
 
-//    cout << endl << " generated: af1: " << af1 << " af2: " << af2 << endl;
-//    cout << endl << " generated: af4: " << af4 << " af3: " << af3 << endl;
+    cout << endl << " generated: anpsfk: " << anpsfk;
+    cout << endl << " generated: pnpsfk: " << pnpsfk << endl;
 
 //    cout << endl << " generated: saf1: " << saf1 << " saf0: " << saf0 << endl;
 //    cout << endl << " generated: cfin: " << cfin << " cfid: " << cfid << endl;
@@ -304,13 +304,9 @@ int main()
 
     zeroResults();
 
-    perform_march_ps();
+//    perform_march_ps();
+    perform_matc_line();
     printStatistic();
-
-//    zeroResults();
-//    perform_gaplat();
-//    cout << endl << "GAPLAT testing." << endl << endl;
-//    printStatistic();
 
     return 0;
 }

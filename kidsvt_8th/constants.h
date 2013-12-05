@@ -13,7 +13,7 @@
 #define ANPSFK9 20
 
 // ### values
-#define PNPSFK5_VALUE 1
+#define PNPSFK5_VALUE 0
 
 /*
 TOP_LEFT TOP_MIDDLE TOP_RIGHT
@@ -24,13 +24,21 @@ BOTTOM_LEFT BOTTOM_MIDDLE BOTTOM_RIGHT
 */
 
 //links
-#define TOP_RIGHT 10
-#define TOP_LEFT 11
 #define TOP_MIDDLE 12
 
-#define BOTTOM_RIGHT 20
-#define BOTTOM_LEFT 21
 #define BOTTOM_MIDDLE 22
 
 #define LEFT_MIDDLE 32
 #define RIGHT_MIDDLE 42
+
+// apn
+#define APN_TOP_RIGHT 50
+#define APN_TOP_LEFT 51
+#define APN_TOP_MIDDLE 52
+
+#define APN_BOTTOM_RIGHT 53
+#define APN_BOTTOM_LEFT 54
+#define APN_BOTTOM_MIDDLE 55
+
+#define APN_LEFT_MIDDLE 56
+#define APN_RIGHT_MIDDLE 57

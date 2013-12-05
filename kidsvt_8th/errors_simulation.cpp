@@ -44,8 +44,81 @@ short readBit_t(long row_index, long column_index)
 
 void writeBit_t(long row_index, long column_index, short value)
 {
-    writeBit(row_index, column_index, value);
+    if (faults[row_index][column_index] == PNPSFK5){
+        short s1 = readBit(row_index - 1, column_index);
+        short s2 = readBit(row_index + 1, column_index);
+        short s3 = readBit(row_index, column_index - 1);
+        short s4 = readBit(row_index, column_index + 1);
 
+        if ((s1 == PNPSFK5_VALUE) && (s2 == PNPSFK5_VALUE)
+            && (s3 == PNPSFK5_VALUE) && (s4 == PNPSFK5_VALUE))
+            setErrorState(row_index, column_index, PNPSFK5);
+            return;
+        }
+
+    if (faults_links[row_index][column_index] >= APN_TOP_RIGHT &&
+        faults_links[row_index][column_index] <= APN_RIGHT_MIDDLE){
+
+        short link_value = readBit(row_index, column_index);
+        writeBit(row_index, column_index, value);
+        if (link_value == value)
+            return;
+
+        short base_value;
+        switch (faults_links[row_index][column_index]) {
+            case APN_TOP_RIGHT:
+                base_value = readBit(row_index + 1, column_index - 1);
+                base_value = (base_value == 0)? 1 : 0;
+                writeBit(row_index + 1, column_index - 1, base_value);
+                setErrorState(row_index + 1, column_index - 1, ANPSFK9);
+                break;
+            case APN_TOP_LEFT:
+                base_value = readBit(row_index + 1, column_index + 1);
+                base_value = (base_value == 0)? 1 : 0;
+                writeBit(row_index + 1, column_index + 1, base_value);
+                setErrorState(row_index + 1, column_index + 1, ANPSFK9);
+                break;
+            case APN_TOP_MIDDLE:
+                base_value = readBit(row_index + 1, column_index);
+                base_value = (base_value == 0)? 1 : 0;
+                writeBit(row_index + 1, column_index, base_value);
+                setErrorState(row_index + 1, column_index, ANPSFK9);
+                break;
+            case APN_BOTTOM_RIGHT:
+                base_value = readBit(row_index - 1, column_index - 1);
+                base_value = (base_value == 0)? 1 : 0;
+                writeBit(row_index - 1, column_index - 1, base_value);
+                setErrorState(row_index - 1, column_index - 1, ANPSFK9);
+                break;
+            case APN_BOTTOM_LEFT:
+                base_value = readBit(row_index - 1, column_index + 1);
+                base_value = (base_value == 0)? 1 : 0;
+                writeBit(row_index - 1, column_index + 1, base_value);
+                setErrorState(row_index - 1, column_index + 1, ANPSFK9);
+                break;
+            case APN_BOTTOM_MIDDLE:
+                base_value = readBit(row_index - 1, column_index);
+                base_value = (base_value == 0)? 1 : 0;
+                writeBit(row_index - 1, column_index, base_value);
+                setErrorState(row_index - 1, column_index, ANPSFK9);
+                break;
+            case APN_LEFT_MIDDLE:
+                base_value = readBit(row_index, column_index + 1);
+                base_value = (base_value == 0)? 1 : 0;
+                writeBit(row_index, column_index + 1, base_value);
+                setErrorState(row_index, column_index - 1, ANPSFK9);
+                break;
+            case APN_RIGHT_MIDDLE:
+                base_value = readBit(row_index, column_index - 1);
+                base_value = (base_value == 0)? 1 : 0;
+                writeBit(row_index, column_index - 1, base_value);
+                setErrorState(row_index, column_index - 1, ANPSFK9);
+                break;
+        }
+        return;
+    }
+
+    writeBit(row_index, column_index, value);
 }
 
 
@@ -61,7 +134,10 @@ void allocErrorStorage()
         faults_links[i] = new short[RAM_CAPACITY_COLUMNS];
         broken_cells[i] = new short[RAM_CAPACITY_COLUMNS];
         broken_cells_found[i] = new short[RAM_CAPACITY_COLUMNS];
+
+
     }
+
 }
 
 void zeroResults()
@@ -85,8 +161,12 @@ void processErrorForIndex(long row_index, long column_index)
     short fault_type = broken_cells[row_index][column_index];
 
     if (broken_cells_found[row_index][column_index] == NO_EXISTING_FAULT){
-            ;;;
-
+        if (fault_type == ANPSFK9){
+            anpskf_found++;
+        }
+        else if (fault_type == PNPSFK5){
+            pnpskf_found++;
+        }
 
         broken_cells_found[row_index][column_index] = FOUND_FAULT;
     }

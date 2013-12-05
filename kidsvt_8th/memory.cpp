@@ -23,10 +23,13 @@ void zeroMemory()
 
 void writeBit(long row, long column, short value)
 {
-    ram[row][column] = value;
+    if ((row >= 0 && row < RAM_CAPACITY_ROWS) && (column >= 0 && column < RAM_CAPACITY_COLUMNS))
+        ram[row][column] = value;
 }
 
 short readBit(long row, long column)
 {
-    return ram[row][column];
+    if ((row >= 0 && row < RAM_CAPACITY_ROWS) && (column >= 0 && column < RAM_CAPACITY_COLUMNS))
+        return ram[row][column];
+    return -200;
 }
