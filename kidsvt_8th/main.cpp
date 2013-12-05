@@ -12,8 +12,8 @@ void generateFaults()
     long pnpsfk = 0, anpsfk = 0;
 
     bool setPN = true;
-    for (long row = 1; row < RAM_CAPACITY_ROWS - 1; row+=4){
-        for (long column = 1; column < RAM_CAPACITY_COLUMNS - 1; column+=4){
+    for (long row = 1; row < RAM_CAPACITY_ROWS - 1; row+=8){
+        for (long column = 1; column < RAM_CAPACITY_COLUMNS - 1; column+=8){
 
             if ((column > 0) && (column < RAM_CAPACITY_COLUMNS - 1)){
                 if ((row > 0) && (row < RAM_CAPACITY_ROWS - 1)){
@@ -48,9 +48,6 @@ void generateFaults()
 
     cout << endl << " generated: anpsfk: " << anpsfk;
     cout << endl << " generated: pnpsfk: " << pnpsfk << endl;
-
-//    cout << endl << " generated: saf1: " << saf1 << " saf0: " << saf0 << endl;
-//    cout << endl << " generated: cfin: " << cfin << " cfid: " << cfid << endl;
 
 }
 
@@ -104,8 +101,8 @@ void perform_matc_line()
     }
 
     // r0-w1
-    for (long i = RAM_CAPACITY_ROWS - 1; i >= 0; i--){
-        for (long j = RAM_CAPACITY_COLUMNS - 1; j >= 0; j--){
+    for (long i = 0; i < RAM_CAPACITY_ROWS; i++){
+        for (long j = 0; j < RAM_CAPACITY_COLUMNS; j++){
             short cell_value = readBit_t(i, j);
             if (cell_value == BROKEN_CELL){
                 processErrorForIndex(i, j);
@@ -118,8 +115,8 @@ void perform_matc_line()
     }
 
     // r1-w0
-    for (long i = RAM_CAPACITY_ROWS - 1; i >= 0; i--){
-        for (long j = RAM_CAPACITY_COLUMNS - 1; j >= 0; j--){
+    for (long i = 0; i < RAM_CAPACITY_ROWS; i++){
+        for (long j = 0; j < RAM_CAPACITY_COLUMNS; j++){
             short cell_value = readBit_t(i, j);
             if (cell_value == BROKEN_CELL){
                 processErrorForIndex(i, j);
@@ -132,8 +129,8 @@ void perform_matc_line()
     }
 
     // r0
-    for (long i = RAM_CAPACITY_ROWS - 1; i >= 0; i--){
-        for (long j = RAM_CAPACITY_COLUMNS - 1; j >= 0; j--){
+    for (long i = 0; i < RAM_CAPACITY_ROWS; i++){
+        for (long j = 0; j < RAM_CAPACITY_COLUMNS; j++){
             short cell_value = readBit_t(i, j);
             if (cell_value == BROKEN_CELL){
                 processErrorForIndex(i, j);
@@ -304,8 +301,12 @@ int main()
 
     zeroResults();
 
-//    perform_march_ps();
     perform_matc_line();
+    printStatistic();
+
+    zeroResults();
+
+    perform_march_ps();
     printStatistic();
 
     return 0;

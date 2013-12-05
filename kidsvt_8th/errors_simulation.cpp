@@ -17,8 +17,8 @@ short** broken_cells_found;
 
 void setErrorState(long row_index, long column_index, short type)
 {
-    if ((broken_cells_found[row_index][column_index] == FOUND_FAULT) || (broken_cells[row_index][column_index] == type))
-        return;
+//    if ((broken_cells_found[row_index][column_index] == FOUND_FAULT) || (broken_cells[row_index][column_index] == type))
+//        return;
 
     broken_cells[row_index][column_index] = type;
 
@@ -59,61 +59,61 @@ void writeBit_t(long row_index, long column_index, short value)
     if (faults_links[row_index][column_index] >= APN_TOP_RIGHT &&
         faults_links[row_index][column_index] <= APN_RIGHT_MIDDLE){
 
-        short link_value = readBit(row_index, column_index);
-        writeBit(row_index, column_index, value);
-        if (link_value == value)
-            return;
+//        short link_value = readBit(row_index, column_index);
+//        writeBit(row_index, column_index, value);
+//        if (link_value == value)
+//            return;
 
-        short base_value;
+        short base_value = 1;
         switch (faults_links[row_index][column_index]) {
             case APN_TOP_RIGHT:
-                base_value = readBit(row_index + 1, column_index - 1);
-                base_value = (base_value == 0)? 1 : 0;
+//                base_value = readBit(row_index + 1, column_index - 1);
+//                base_value = (base_value == 0)? 1 : 0;
                 writeBit(row_index + 1, column_index - 1, base_value);
                 setErrorState(row_index + 1, column_index - 1, ANPSFK9);
-                break;
+                return;;
             case APN_TOP_LEFT:
-                base_value = readBit(row_index + 1, column_index + 1);
-                base_value = (base_value == 0)? 1 : 0;
+//                base_value = readBit(row_index + 1, column_index + 1);
+//                base_value  (base_value == 0)? 1 : 0;
                 writeBit(row_index + 1, column_index + 1, base_value);
                 setErrorState(row_index + 1, column_index + 1, ANPSFK9);
-                break;
+                return;;
             case APN_TOP_MIDDLE:
-                base_value = readBit(row_index + 1, column_index);
-                base_value = (base_value == 0)? 1 : 0;
+//                base_value = readBit(row_index + 1, column_index);
+//                base_value = (base_value == 0)? 1 : 0;
                 writeBit(row_index + 1, column_index, base_value);
                 setErrorState(row_index + 1, column_index, ANPSFK9);
-                break;
+                return;
             case APN_BOTTOM_RIGHT:
-                base_value = readBit(row_index - 1, column_index - 1);
-                base_value = (base_value == 0)? 1 : 0;
+//                base_value = readBit(row_index - 1, column_index - 1);
+//                base_value = (base_value == 0)? 1 : 0;
                 writeBit(row_index - 1, column_index - 1, base_value);
                 setErrorState(row_index - 1, column_index - 1, ANPSFK9);
-                break;
+                return;
             case APN_BOTTOM_LEFT:
-                base_value = readBit(row_index - 1, column_index + 1);
-                base_value = (base_value == 0)? 1 : 0;
+//                base_value = readBit(row_index - 1, column_index + 1);
+//                base_value = (base_value == 0)? 1 : 0;
                 writeBit(row_index - 1, column_index + 1, base_value);
                 setErrorState(row_index - 1, column_index + 1, ANPSFK9);
-                break;
+                return;;
             case APN_BOTTOM_MIDDLE:
-                base_value = readBit(row_index - 1, column_index);
-                base_value = (base_value == 0)? 1 : 0;
+//                base_value = readBit(row_index - 1, column_index);
+//                base_value = (base_value == 0)? 1 : 0;
                 writeBit(row_index - 1, column_index, base_value);
                 setErrorState(row_index - 1, column_index, ANPSFK9);
-                break;
+                return;;
             case APN_LEFT_MIDDLE:
-                base_value = readBit(row_index, column_index + 1);
-                base_value = (base_value == 0)? 1 : 0;
+//                base_value = readBit(row_index, column_index + 1);
+//                base_value = (base_value == 0)? 1 : 0;
                 writeBit(row_index, column_index + 1, base_value);
                 setErrorState(row_index, column_index - 1, ANPSFK9);
-                break;
+                return;;
             case APN_RIGHT_MIDDLE:
-                base_value = readBit(row_index, column_index - 1);
-                base_value = (base_value == 0)? 1 : 0;
+//                base_value = readBit(row_index, column_index - 1);
+//                base_value = (base_value == 0)? 1 : 0;
                 writeBit(row_index, column_index - 1, base_value);
                 setErrorState(row_index, column_index - 1, ANPSFK9);
-                break;
+                return;
         }
         return;
     }
